@@ -25,6 +25,7 @@ uniform float uMass;     // 0..1, driven by the microphone
 uniform float uReduced;  // 1.0 when the visitor asked for reduced motion
 uniform float uPixel;    // device pixels per art pixel
 uniform float uDrift;    // accumulated sideways travel, in art pixels
+uniform float uPulse;    // 0..1, spikes on click and decays back down
 uniform sampler2D uText; // the headings, painted at art-pixel resolution
 uniform float uReveal;   // radius of the lit area around the singularity
 
@@ -85,8 +86,10 @@ void main() {
   float dist = length(toCenter);
   vec2 dir = toCenter / max(dist, 1e-4);
 
-  // Horizon grows as the voice feeds it.
-  float rs = (0.021 + 0.038 * uMass) * res.y;
+  // Horizon grows as the voice feeds it, and swells for an instant on click:
+  // since the ring and the lensing below are both derived from rs, the whole
+  // shape pulses together instead of just changing colour.
+  float rs = (0.021 + 0.038 * uMass + 0.0025 * uPulse) * res.y;
 
   // Light bends towards the mass: sample the sky pulled outwards, on whole
   // pixels, so the stars stay aligned to the grid while they stretch.
@@ -121,7 +124,7 @@ void main() {
   // coverage so it can stay below one grid pixel: pixels on the radius light
   // fully, their neighbours barely, and the posterise step drops the faintest.
   float ring = 1.0 - smoothstep(0.0, max(0.30, rs * 0.025), abs(dist - rs * 1.45));
-  color += ring * (0.18 + 0.34 * uMass);
+  color += ring * (0.42 + 0.34 * uMass + 0.04 * uPulse);
 
   // The shadow itself: nothing comes back out.
   color *= step(rs, dist);

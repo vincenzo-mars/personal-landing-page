@@ -22,6 +22,10 @@ const DRIFT_TAU = 0.3;
 /** Loudness rises fast and falls slow, so the light breathes instead of flickering. */
 const MASS_ATTACK_TAU = 0.08;
 const MASS_RELEASE_TAU = 0.5;
+/** Seconds for a click's swell to ease in before it starts decaying. */
+const PULSE_ATTACK = 0.16;
+/** Seconds for it to decay back down once it has peaked. */
+const PULSE_DECAY = 0.4;
 
 export function CosmicScene() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -80,6 +84,7 @@ export function CosmicScene() {
         uReduced: { value: reducedMotion.matches ? 1 : 0 },
         uPixel: { value: ART_PIXEL },
         uDrift: { value: 0 },
+        uPulse: { value: 0 },
         uText: { value: textTexture },
         uReveal: { value: 1 },
       },
@@ -115,6 +120,8 @@ export function CosmicScene() {
     let drift = 0;
     let lateral = 0;
     let previousX = 0.5;
+    let seenClicks = pointer.current.clicks;
+    let sinceClick = Infinity;
     let elapsed = 0;
     let last = performance.now();
     let frame = 0;
@@ -149,10 +156,25 @@ export function CosmicScene() {
       const tau = loudness > mass ? MASS_ATTACK_TAU : MASS_RELEASE_TAU;
       mass += (loudness - mass) * (1 - Math.exp(-dt / tau));
 
+      // A click restarts the envelope: an eased entrance, then an exponential
+      // decay once it has peaked. A second click before it settles just
+      // restarts the ramp from wherever the previous one had reached.
+      if (pointer.current.clicks !== seenClicks) {
+        seenClicks = pointer.current.clicks;
+        sinceClick = 0;
+      } else {
+        sinceClick += dt;
+      }
+      const attack = Math.min(1, sinceClick / PULSE_ATTACK);
+      const entrance = attack * attack * (3 - 2 * attack); // smoothstep ease-in
+      const decay = Math.exp(-Math.max(0, sinceClick - PULSE_ATTACK) / PULSE_DECAY);
+      const pulse = entrance * decay;
+
       program.uniforms.uTime.value = elapsed;
       program.uniforms.uPointer.value = [smoothX, 1 - smoothY];
       program.uniforms.uMass.value = mass;
       program.uniforms.uDrift.value = drift;
+      program.uniforms.uPulse.value = pulse;
 
       // The reveal radius rides the same mass, in art pixels for the shader.
       const shortest = Math.min(gl.drawingBufferWidth, gl.drawingBufferHeight) / (ART_PIXEL * renderer.dpr);

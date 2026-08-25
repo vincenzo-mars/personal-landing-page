@@ -8,6 +8,8 @@ export type Pointer = {
   y: number;
   /** false until the visitor has actually moved something */
   engaged: boolean;
+  /** Bumped on every press: the render loop watches it to trigger a pulse. */
+  clicks: number;
 };
 
 /**
@@ -15,7 +17,7 @@ export type Pointer = {
  * storing it in state would re-render the tree at 60fps for nothing.
  */
 export function usePointer() {
-  const pointer = useRef<Pointer>({ x: 0.5, y: 0.5, engaged: false });
+  const pointer = useRef<Pointer>({ x: 0.5, y: 0.5, engaged: false, clicks: 0 });
 
   useEffect(() => {
     const track = (event: PointerEvent) => {
@@ -24,17 +26,22 @@ export function usePointer() {
       pointer.current.engaged = true;
     };
 
+    const press = (event: PointerEvent) => {
+      track(event);
+      pointer.current.clicks += 1;
+    };
+
     const release = () => {
       pointer.current.engaged = false;
     };
 
     window.addEventListener("pointermove", track, { passive: true });
-    window.addEventListener("pointerdown", track, { passive: true });
+    window.addEventListener("pointerdown", press, { passive: true });
     window.addEventListener("pointerleave", release);
 
     return () => {
       window.removeEventListener("pointermove", track);
-      window.removeEventListener("pointerdown", track);
+      window.removeEventListener("pointerdown", press);
       window.removeEventListener("pointerleave", release);
     };
   }, []);

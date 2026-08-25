@@ -1,14 +1,10 @@
 import type { NextConfig } from "next";
 
-// Served from https://vincenzo-mars.github.io/personal-landing-page, so every
-// route and asset lives under that prefix, not at the root.
-const basePath = "/personal-landing-page";
-
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  // Static export for GitHub Pages. The repository is the user site, so the
+  // whole thing is served from the root: no basePath, no asset prefix.
   output: "export",
-  basePath,
-  assetPrefix: basePath,
   images: { unoptimized: true },
 };
 

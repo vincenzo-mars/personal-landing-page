@@ -48,15 +48,14 @@ deliberate release PR from `develop`. Merging that PR is what puts the site onli
 
 ## Deploy
 
-Published on GitHub Pages at https://vincenzo-mars.github.io/personal-landing-page/ by
+Published on GitHub Pages at https://vincenzo-mars.github.io/ by
 `.github/workflows/deploy.yml`, which runs on every push to `main` (Pages source is set to
-GitHub Actions, not a branch).
+GitHub Actions, not a branch). The repository is named `vincenzo-mars.github.io`, which makes it
+the account's user site: it is served from the root, so there is no `basePath` to carry around.
 
 Consequences of `output: "export"` in `next.config.ts`: the whole site is static HTML in `out/`,
-so no SSR, Server Actions, ISR, middleware or dynamic route handlers. `next/image` runs with
-`unoptimized: true`. Every route and asset is prefixed with `basePath` `/personal-landing-page`,
-in `next dev` too: locally the site answers on http://localhost:3000/personal-landing-page.
-Use `next/link` and `next/image` rather than hand-written paths and the prefix is handled for you.
+so no SSR, Server Actions, ISR, middleware or dynamic route handlers, and `next/image` runs with
+`unoptimized: true`.
 
 ## Releases
 

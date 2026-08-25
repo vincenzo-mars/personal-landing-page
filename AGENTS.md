@@ -8,9 +8,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# personal-landing-page
+# who-am-i
 
 Personal landing page of Vincenzo Mars. Single Next.js app, no monorepo, no backend of its own.
+Local project name and package name are `who-am-i`; the GitHub repository stays
+`vincenzo-mars.github.io` on purpose, since that name is what puts the site at the account root.
 
 ## Stack
 
@@ -40,17 +42,22 @@ public/           static assets served from /
 
 Colocate components with the route that uses them until a second consumer appears; shared ones go in `src/components/`.
 
+## Branches
+
+`develop` is the default branch and where work lands: every feature or fix branch opens its PR
+against `develop`. `main` is the published state, and nothing is merged into it except a
+deliberate release PR from `develop`. Merging that PR is what puts the site online.
+
 ## Deploy
 
-Published on GitHub Pages at https://vincenzo-mars.github.io/personal-landing-page/ by
+Published on GitHub Pages at https://vincenzo-mars.github.io/ by
 `.github/workflows/deploy.yml`, which runs on every push to `main` (Pages source is set to
-GitHub Actions, not a branch). Work happens on `develop` and reaches `main` through a PR.
+GitHub Actions, not a branch). The repository is named `vincenzo-mars.github.io`, which makes it
+the account's user site: it is served from the root, so there is no `basePath` to carry around.
 
 Consequences of `output: "export"` in `next.config.ts`: the whole site is static HTML in `out/`,
-so no SSR, Server Actions, ISR, middleware or dynamic route handlers. `next/image` runs with
-`unoptimized: true`. Every route and asset is prefixed with `basePath` `/personal-landing-page`,
-in `next dev` too: locally the site answers on http://localhost:3000/personal-landing-page.
-Use `next/link` and `next/image` rather than hand-written paths and the prefix is handled for you.
+so no SSR, Server Actions, ISR, middleware or dynamic route handlers, and `next/image` runs with
+`unoptimized: true`.
 
 ## Releases
 
@@ -60,8 +67,12 @@ conventional commits since the last tag into a release PR that bumps `package.js
 breaking changes show up in the changelog and move the version, so a batch of `chore:` commits
 produces no release PR at all.
 
-The PR from `develop` to `main` must be merged with a **merge commit**: squashing would collapse
-the history into the PR title and release-please would only see that one message.
+The release PR from `develop` to `main` must be merged with a **merge commit**: squashing would
+collapse the history into the PR title and release-please would only see that one message.
+
+Since `develop` is the repository default branch, the action carries an explicit
+`target-branch: main`. Drop it and release-please silently inspects `develop` instead, reports
+success and opens nothing.
 
 ## Conventions
 

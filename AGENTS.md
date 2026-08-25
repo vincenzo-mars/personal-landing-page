@@ -40,11 +40,17 @@ public/           static assets served from /
 
 Colocate components with the route that uses them until a second consumer appears; shared ones go in `src/components/`.
 
+## Branches
+
+`develop` is the default branch and where work lands: every feature or fix branch opens its PR
+against `develop`. `main` is the published state, and nothing is merged into it except a
+deliberate release PR from `develop`. Merging that PR is what puts the site online.
+
 ## Deploy
 
 Published on GitHub Pages at https://vincenzo-mars.github.io/personal-landing-page/ by
 `.github/workflows/deploy.yml`, which runs on every push to `main` (Pages source is set to
-GitHub Actions, not a branch). Work happens on `develop` and reaches `main` through a PR.
+GitHub Actions, not a branch).
 
 Consequences of `output: "export"` in `next.config.ts`: the whole site is static HTML in `out/`,
 so no SSR, Server Actions, ISR, middleware or dynamic route handlers. `next/image` runs with
@@ -60,8 +66,12 @@ conventional commits since the last tag into a release PR that bumps `package.js
 breaking changes show up in the changelog and move the version, so a batch of `chore:` commits
 produces no release PR at all.
 
-The PR from `develop` to `main` must be merged with a **merge commit**: squashing would collapse
-the history into the PR title and release-please would only see that one message.
+The release PR from `develop` to `main` must be merged with a **merge commit**: squashing would
+collapse the history into the PR title and release-please would only see that one message.
+
+Since `develop` is the repository default branch, the action carries an explicit
+`target-branch: main`. Drop it and release-please silently inspects `develop` instead, reports
+success and opens nothing.
 
 ## Conventions
 

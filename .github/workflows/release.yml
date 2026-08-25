@@ -16,3 +16,6 @@ jobs:
       - uses: googleapis/release-please-action@v5
         with:
           release-type: node
+          # Without this the action reads the repository default branch, which
+          # here is develop: releases are cut from main.
+          target-branch: main

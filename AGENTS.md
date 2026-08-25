@@ -8,9 +8,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# personal-landing-page
+# who-am-i
 
 Personal landing page of Vincenzo Mars. Single Next.js app, no monorepo, no backend of its own.
+Local project name and package name are `who-am-i`; the GitHub repository stays
+`vincenzo-mars.github.io` on purpose, since that name is what puts the site at the account root.
 
 ## Stack
 
